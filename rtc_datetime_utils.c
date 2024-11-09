@@ -25,6 +25,7 @@
 // Enumeration for easier fiddling around
 // with month names.
 enum m_length {
+    INVALID,
     JAN,
     FEB,
     MAR,
@@ -42,6 +43,7 @@ enum m_length {
 
 /* Month length in days */
 static const uint8_t month_lengths[m_length_max] = {
+    0, // invalid
     31, // Jan
     28, // Feb
     31, // Mar
@@ -130,8 +132,43 @@ void increment_hour(rtc_datetime_t *dt)
     increment_day(dt);
 }
 
-void decrement_hour(rtc_datetime_t *dt);
-void increment_day(rtc_datetime_t *dt);
+void decrement_hour(rtc_datetime_t *dt)
+{
+    if(dt->hour > 0)
+    {
+        --(dt->hour);
+    }
+    else
+    {
+        dt->hour = HOUR_MAX;
+        decrement_day(&dt);
+    }
+}
+
+void increment_day(rtc_datetime_t *dt)
+{
+    // if the actual year is a leapyear,
+    // set the offset to 1.
+    uint8_t leapyear_offset = _is_leapyear(dt->year)+ 2000 ? 1 : 0;
+    
+    // calculate the length of this month
+    uint8_t length_of_this_month = dt->month == FEB ? month_lengths[dt->month] + leapyear_offset : month_lengths[dt->month];
+    
+    // increment day and test if length of this month
+    // is exceeded.
+    if(++(dt->day) < length_of_this_month)
+    {
+        // not exceeded, done!
+        return;
+    }
+    else
+    {
+        // exceeded, so reset day and increment month.
+        dt->day = 0;
+        increment_month(&dt);
+    }
+
+}
 void decrement_day(rtc_datetime_t *dt);
 void increment_month(rtc_datetime_t *dt);
 void decrement_month(rtc_datetime_t *dt);
