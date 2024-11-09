@@ -63,6 +63,15 @@ bool _is_leapyear(uint16_t year)
     return ( (year % 4 == 0) && (year % 100 != 0) || (year %400 == 0));
 }
 
+uint8_t _calc_month_length(uint8_t month, uint8_t year)
+{
+    uint8_t leapyear_offset = _is_leapyear(year)+ 2000 ? 1 : 0;
+    
+    // calculate the length of this month
+    uint8_t length_of_this_month = month == FEB ? month_lengths[month] + leapyear_offset : month_lengths[month];
+    return length_of_this_month;
+}
+
 void increment_second(rtc_datetime_t *dt)
 {
     if(++(dt->sec) < SECOND_MAX)
@@ -147,16 +156,10 @@ void decrement_hour(rtc_datetime_t *dt)
 
 void increment_day(rtc_datetime_t *dt)
 {
-    // if the actual year is a leapyear,
-    // set the offset to 1.
-    uint8_t leapyear_offset = _is_leapyear(dt->year)+ 2000 ? 1 : 0;
-    
-    // calculate the length of this month
-    uint8_t length_of_this_month = dt->month == FEB ? month_lengths[dt->month] + leapyear_offset : month_lengths[dt->month];
     
     // increment day and test if length of this month
     // is exceeded.
-    if(++(dt->day) < length_of_this_month)
+    if(++(dt->day) < _calc_month_length(dt->month, dt->year))
     {
         // not exceeded, done!
         return;
@@ -169,8 +172,33 @@ void increment_day(rtc_datetime_t *dt)
     }
 
 }
-void decrement_day(rtc_datetime_t *dt);
-void increment_month(rtc_datetime_t *dt);
+
+void decrement_day(rtc_datetime_t *dt)
+{
+    if(dt->day > 0)
+    {
+        --(dt->day);
+    }
+    else
+    {
+        dt->day = _calc_month_length(dt->month, dt->year);
+        decrement_month(dt);
+    }
+}
+
+void increment_month(rtc_datetime_t *dt)
+{
+    if(++(dt->month) < m_length_max)
+    {
+        return;
+    }
+    else
+    {
+        dt->month = JAN;
+        increment_year(&dt);
+    }
+}
+
 void decrement_month(rtc_datetime_t *dt);
 void increment_year(rtc_datetime_t *dt);
 void decrement_year(rtc_datetime_t *dt);
