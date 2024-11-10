@@ -126,6 +126,7 @@ void decrement_minute(rtc_datetime_t *dt)
 }
 
 void increment_hour(rtc_datetime_t *dt)
+{
     if(++(dt->hour) < HOUR_MAX)
     // pre increment hour and test if
     // hour exceeds limit
@@ -149,7 +150,7 @@ void decrement_hour(rtc_datetime_t *dt)
     else
     {
         dt->hour = HOUR_MAX;
-        decrement_day(&dt);
+        decrement_day(dt);
     }
 }
 
@@ -167,7 +168,7 @@ void increment_day(rtc_datetime_t *dt)
     {
         // exceeded, so reset day and increment month.
         dt->day = 0;
-        increment_month(&dt);
+        increment_month(dt);
     }
 
 }
@@ -194,7 +195,7 @@ void increment_month(rtc_datetime_t *dt)
     else
     {
         dt->month = JAN;
-        increment_year(&dt);
+        increment_year(dt);
     }
 }
 
