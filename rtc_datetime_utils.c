@@ -126,7 +126,6 @@ void decrement_minute(rtc_datetime_t *dt)
 }
 
 void increment_hour(rtc_datetime_t *dt)
-{
     if(++(dt->hour) < HOUR_MAX)
     // pre increment hour and test if
     // hour exceeds limit
@@ -199,6 +198,16 @@ void increment_month(rtc_datetime_t *dt)
     }
 }
 
-void decrement_month(rtc_datetime_t *dt);
+void decrement_month(rtc_datetime_t *dt)
+{
+  if (dt->month > 0)
+  {
+    --(dt->month);
+    return;
+  }
+  else {
+    dt->month = DEC;
+    decrement_year(dt);
+  }
+}
 void increment_year(rtc_datetime_t *dt);
-void decrement_year(rtc_datetime_t *dt);
