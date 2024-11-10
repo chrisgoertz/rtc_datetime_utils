@@ -21,6 +21,7 @@
 #define SECOND_MAX      (59)
 #define MINUTE_MAX      (59)
 #define HOUR_MAX        (23)
+#define YEAR_MAX        (99)
 
 // Enumeration for easier fiddling around
 // with month names.
@@ -211,4 +212,28 @@ void decrement_month(rtc_datetime_t *dt)
     decrement_year(dt);
   }
 }
-void increment_year(rtc_datetime_t *dt);
+void increment_year(rtc_datetime_t *dt)
+{
+  if(++(dt->year) < YEAR_MAX)
+  {
+    return;
+  }
+  else
+  {
+    dt->year = 0;
+  }
+  
+}
+
+void decrement_year(rtc_datetime_t *dt)
+{
+  if(dt->year == 0)
+  {
+    return;
+  }
+  else
+  {
+    --(dt->year);
+  }
+
+}
